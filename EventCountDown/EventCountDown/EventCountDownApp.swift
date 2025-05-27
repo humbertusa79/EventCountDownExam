@@ -11,7 +11,7 @@ import SwiftUI
 struct EventCountDownApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView().environmentObject(EventsViewModel(repository: EventsRepository()))
         }
     }
 }
