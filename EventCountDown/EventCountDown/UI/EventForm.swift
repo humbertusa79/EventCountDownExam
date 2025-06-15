@@ -14,11 +14,23 @@ enum Mode {
 
 struct EventForm: View {
     
-    @Binding var title: String
-    @Binding var date: Date
-    @Binding var color: Color
+    @State private var title: String
+    @State private var date: Date
+    @State private var color: Color
     let mode: Mode
     var onSave: ((Event) -> Void)?
+    
+    init(title: String,
+         date: Date,
+         color: Color,
+         mode: Mode,
+         onSave: ((Event) -> Void)? = nil) {
+        self.title = title
+        self.date = date
+        self.color = color
+        self.mode = mode
+        self.onSave = onSave
+    }
     
 
     var body: some View {
@@ -66,9 +78,9 @@ struct EventForm_Preview: PreviewProvider {
         @State private var previewDate = Date.now
         @State private var previewColor = Color.red
         var body: some View {
-            return EventForm(title: $previewTitle,
-                             date: $previewDate,
-                             color: $previewColor,
+            return EventForm(title: previewTitle,
+                             date: previewDate,
+                             color: previewColor,
                              mode: .add,
                              onSave: nil)
         }

@@ -9,9 +9,10 @@ import SwiftUI
 
 @main
 struct EventCountDownApp: App {
+    @State private var viewModel = EventsViewModel()
     var body: some Scene {
         WindowGroup {
-            ContentView().environmentObject(EventsViewModel(repository: EventsRepository()))
+            ContentView().environment(viewModel)
         }
     }
 }
