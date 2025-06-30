@@ -11,7 +11,7 @@ import SwiftUI
 
 @Observable
 final class EventsViewModel {
-    var events: [Event]
+    private var events: [Event]
     
     private var currentDate = Date.now
     private var cancellables: [AnyCancellable] = []
@@ -20,6 +20,27 @@ final class EventsViewModel {
         self.events = events
         self.currentDate = currentDate
         
+    }
+    
+    var eventList: [Event] {
+        return events
+    }
+    
+    func save(newEvent: Event) {
+        events.append(newEvent)
+    }
+    
+    func edit(newEvent: Event) {
+        let event = events.first {
+            $0.id == newEvent.id
+        }
+        guard var event else {
+            save(newEvent: newEvent)
+            return
+        }
+        event.title = newEvent.title
+        event.date = newEvent.date
+        event.textColor = newEvent.textColor
     }
     
     private func startTimer() {

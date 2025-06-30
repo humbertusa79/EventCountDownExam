@@ -12,24 +12,9 @@ struct ContentView: View {
     @State private var path = NavigationPath()
     
     var body: some View {
-        NavigationStack {
+        VStack {
             EventsView()
         }
-        .navigationTitle("Events form")
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button(action: {
-                    path.append("add")
-                }) {
-                    Image(systemName: "plus")
-                }
-            }
-        }.navigationDestination(for: String.self) { value in
-            if value == "add" {
-                EventForm()
-            }
-        }
-        
     }
 }
 

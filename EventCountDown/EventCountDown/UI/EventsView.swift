@@ -10,10 +10,26 @@ import SwiftUI
 struct EventsView: View {
     @Environment(EventsViewModel.self) private var viewModel
     var body: some View {
-        VStack {
-            Text("Events List")
-            List(viewModel.events, id: \.self) { event in
-                EventRow(event: event)
+        NavigationStack {
+            List(viewModel.eventList, id: \.self) { event in
+                NavigationLink(value: event) {
+                    EventRow(event: event)
+                }
+            }
+            .navigationTitle("Events List")
+            .navigationDestination(for: Event.self) { event in
+                EventForm(mode: .edit(event)) { event in
+                    viewModel.edit(newEvent: event)
+                }
+            }
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: EventForm(mode: .add) { event in
+                        viewModel.save(newEvent: event)
+                    }) {
+                        Image(systemName: "plus")
+                    }
+                }
             }
         }
     }

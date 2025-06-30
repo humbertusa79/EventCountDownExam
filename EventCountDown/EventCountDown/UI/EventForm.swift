@@ -10,25 +10,32 @@ import SwiftUI
 enum Mode {
     case add
     case edit(Event)
+    
+    var event: Event? {
+        switch self {
+        case .add:
+            return nil
+        case .edit(let event):
+            return event
+        }
+    }
 }
 
 struct EventForm: View {
     
-    @State private var title: String
-    @State private var date: Date
-    @State private var color: Color
     let mode: Mode
+    @State var title: String
+    @State var date: Date
+    @State var color: Color
+    @Environment(\.dismiss) private var dismiss
     var onSave: ((Event) -> Void)?
     
-    init(title: String,
-         date: Date,
-         color: Color,
-         mode: Mode,
+    init(mode: Mode,
          onSave: ((Event) -> Void)? = nil) {
-        self.title = title
-        self.date = date
-        self.color = color
         self.mode = mode
+        self.title = mode.event?.title ?? ""
+        self.date = mode.event?.date ?? .now
+        self.color = mode.event?.textColor ?? .black
         self.onSave = onSave
     }
     
@@ -43,23 +50,20 @@ struct EventForm: View {
                            displayedComponents: [.date, .hourAndMinute])
                 ColorPicker("Title color", selection: $color)
             }
-        }.navigationTitle(navTitle)
-            .toolbar {
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
-                        let event = Event(id: UUID(),
-                                          title: title,
-                                          date: date,
-                                          textColor: color)
-                        onSave?(event)
-                    }
-                }
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        
-                    }
+        }
+        .navigationTitle(navTitle)
+        .toolbar {
+            ToolbarItem(placement: .confirmationAction) {
+                Button("Save") {
+                    let event = Event(id: UUID(),
+                                      title: title,
+                                      date: date,
+                                      textColor: color)
+                    onSave?(event)
+                    dismiss()
                 }
             }
+        }
     }
     
     private var navTitle: String {
@@ -78,10 +82,12 @@ struct EventForm_Preview: PreviewProvider {
         @State private var previewDate = Date.now
         @State private var previewColor = Color.red
         var body: some View {
-            return EventForm(title: previewTitle,
-                             date: previewDate,
-                             color: previewColor,
-                             mode: .add,
+            return EventForm(
+                
+                mode: .edit(Event(id: UUID(),
+                                               title: "Test",
+                                               date: .now,
+                                               textColor: .red)),
                              onSave: nil)
         }
     }
