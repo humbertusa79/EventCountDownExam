@@ -11,20 +11,25 @@ struct EventsView: View {
     @Environment(EventsViewModel.self) private var viewModel
     var body: some View {
         NavigationStack {
-            List(viewModel.eventList, id: \.self) { event in
-                NavigationLink(value: event) {
-                    EventRow(event: event)
+            List {
+                ForEach(viewModel.eventList, id: \.self) { event in
+                    NavigationLink(value: event) {
+                        EventRow(event: event)
+                    }
                 }
+                .onDelete(perform: viewModel.deleteEvent)
             }
             .navigationTitle("Events List")
             .navigationDestination(for: Event.self) { event in
-                EventForm(mode: .edit(event)) { event in
+                EventForm(mode: .edit(event),
+                          viewModel: viewModel) { event in
                     viewModel.edit(newEvent: event)
                 }
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(destination: EventForm(mode: .add) { event in
+                    NavigationLink(destination: EventForm(mode: .add,
+                                                          viewModel: viewModel) { event in
                         viewModel.save(newEvent: event)
                     }) {
                         Image(systemName: "plus")

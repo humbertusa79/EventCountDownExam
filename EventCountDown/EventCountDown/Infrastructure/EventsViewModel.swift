@@ -15,11 +15,15 @@ final class EventsViewModel {
     
     private var currentDate = Date.now
     private var cancellables: [AnyCancellable] = []
+    var inputText: String = ""
+    var isValid: Bool  {
+        let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !text.isEmpty
+    }
     
     init(events: [Event] = [], currentDate: Foundation.Date = Date.now) {
         self.events = events
         self.currentDate = currentDate
-        
     }
     
     var eventList: [Event] {
@@ -57,5 +61,9 @@ final class EventsViewModel {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: date, relativeTo: currentDate)
+    }
+
+    func deleteEvent(at offsets: IndexSet) {
+        events.remove(atOffsets: offsets)
     }
 }

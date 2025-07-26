@@ -22,18 +22,18 @@ enum Mode {
 }
 
 struct EventForm: View {
-    
     let mode: Mode
-    @State var title: String
+    @Bindable var viewModel: EventsViewModel
     @State var date: Date
     @State var color: Color
     @Environment(\.dismiss) private var dismiss
     var onSave: ((Event) -> Void)?
     
     init(mode: Mode,
+         viewModel: EventsViewModel,
          onSave: ((Event) -> Void)? = nil) {
         self.mode = mode
-        self.title = mode.event?.title ?? ""
+        self.viewModel = viewModel
         self.date = mode.event?.date ?? .now
         self.color = mode.event?.textColor ?? .black
         self.onSave = onSave
@@ -44,7 +44,12 @@ struct EventForm: View {
         Form {
             Section {
                 TextField("Event title",
-                          text: $title)
+                          text: $viewModel.inputText)
+                if !viewModel.isValid {
+                    Text("Field cannot be empty")
+                        .foregroundColor(.red)
+                        .font(.caption)
+                }
                 DatePicker("Date",
                            selection: $date,
                            displayedComponents: [.date, .hourAndMinute])
@@ -56,12 +61,12 @@ struct EventForm: View {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
                     let event = Event(id: UUID(),
-                                      title: title,
+                                      title: viewModel.inputText,
                                       date: date,
                                       textColor: color)
                     onSave?(event)
                     dismiss()
-                }
+                }.disabled(!viewModel.isValid)
             }
         }
     }
@@ -85,10 +90,11 @@ struct EventForm_Preview: PreviewProvider {
             return EventForm(
                 
                 mode: .edit(Event(id: UUID(),
-                                               title: "Test",
-                                               date: .now,
-                                               textColor: .red)),
-                             onSave: nil)
+                                  title: "Test",
+                                  date: .now,
+                                  textColor: .red)),
+                viewModel: EventsViewModel(),
+                onSave: nil)
         }
     }
     static var previews: some View {
