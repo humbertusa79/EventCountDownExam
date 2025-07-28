@@ -38,13 +38,16 @@ final class EventsViewModel {
         let event = events.first {
             $0.id == newEvent.id
         }
-        guard var event else {
+        guard let event else {
             save(newEvent: newEvent)
             return
         }
-        event.title = newEvent.title
-        event.date = newEvent.date
-        event.textColor = newEvent.textColor
+        guard let index = events.firstIndex(of: event) else {
+            return
+        }
+        
+        events.remove(at: index)
+        events.insert(newEvent, at: index)
     }
     
     private func startTimer() {

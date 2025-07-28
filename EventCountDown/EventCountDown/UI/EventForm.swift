@@ -26,6 +26,7 @@ struct EventForm: View {
     @Bindable var viewModel: EventsViewModel
     @State var date: Date
     @State var color: Color
+    var id: UUID?
     @Environment(\.dismiss) private var dismiss
     var onSave: ((Event) -> Void)?
     
@@ -36,6 +37,8 @@ struct EventForm: View {
         self.viewModel = viewModel
         self.date = mode.event?.date ?? .now
         self.color = mode.event?.textColor ?? .black
+        self.id = mode.event?.id
+        self.viewModel.inputText = mode.event?.title ?? ""
         self.onSave = onSave
     }
     
@@ -60,11 +63,13 @@ struct EventForm: View {
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
                 Button("Save") {
-                    let event = Event(id: UUID(),
+                    let id = self.id
+                    let event = Event(id: id ??  UUID(),
                                       title: viewModel.inputText,
                                       date: date,
                                       textColor: color)
                     onSave?(event)
+                    viewModel.inputText = ""
                     dismiss()
                 }.disabled(!viewModel.isValid)
             }
