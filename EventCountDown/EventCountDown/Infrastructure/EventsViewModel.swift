@@ -14,7 +14,7 @@ final class EventsViewModel {
     private var events: [Event]
     
     private var currentDate = Date.now
-    private var cancellables: [AnyCancellable] = []
+    private var cancellable: AnyCancellable?
     var inputText: String = ""
     var isValid: Bool  {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -32,6 +32,7 @@ final class EventsViewModel {
     
     func save(newEvent: Event) {
         events.append(newEvent)
+        startTimer()
     }
     
     func edit(newEvent: Event) {
@@ -48,16 +49,21 @@ final class EventsViewModel {
         
         events.remove(at: index)
         events.insert(newEvent, at: index)
+        startTimer()
+        
+        
     }
     
     private func startTimer() {
-        Timer.publish(every: 60,
-                      on: .main,
-                      in: .common)
+        guard events.isEmpty == false else { return }
+        guard cancellable == nil else { return }
+        cancellable = Timer.publish(every: 1,
+                                    on: .main,
+                                    in: .common)
         .autoconnect()
         .sink { [weak self] now in
             self?.currentDate = now
-        }.store(in: &cancellables)
+        }
     }
     
     func convertRelative(date: Date) -> String {
